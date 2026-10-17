@@ -1,24 +1,30 @@
+/* year headings: global h4 (300, heading-font-size-m, 10.5px margins) applies */
 .post-list h4 {
-  margin: 10px 0;
-  font-size: 18px;
+  margin: 10.5px 0;
 }
 
+/* source .container.marketing ul: 1.5em indent + 40px padding, 1.25em bottom */
 .post-list ul {
   list-style: disc;
-  margin: 0 0 10px;
+  margin: 0 0 18.75px 22.5px;
   padding-left: 40px;
+  font-size: var(--body-font-size-m);
+  line-height: 1.6;
 }
 
+/* override the global 12px post-body li rule */
 .post-list li {
-  line-height: 1.4286;
+  font-size: var(--body-font-size-m);
+  line-height: 24px;
 }
 
 .post-list a:any-link {
-  color: var(--link-color, #428bca);
+  color: var(--link-color);
   text-decoration: none;
 }
 
 .post-list a:hover,
 .post-list a:focus {
+  color: var(--link-hover-color);
   text-decoration: underline;
 }

@@ -1,51 +1,75 @@
+/*
+ * Columns Framed: asciidoctor `table.tableblock.frame-all.grid-all` layout table.
+ * The source stays a real (auto-layout) table at every viewport: it shrinks to its
+ * content width (max 100%), never stacks, and splits columns by the colgroup widths.
+ */
 .columns-framed {
-  box-sizing: border-box;
-  max-width: 860px;
-  border: 1px solid #ddd;
+  display: table;
+  width: auto;
+  max-width: 100%;
+  margin: 0 0 15px;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-  padding: 8px;
+  border-collapse: separate;
+  border-spacing: 1px;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-size: var(--body-font-size-s);
+  line-height: 1.4286;
 }
 
 .columns-framed > .columns-framed-row {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.columns-framed > .columns-framed-row + .columns-framed-row {
-  margin-top: 16px;
+  display: table-row;
 }
 
 .columns-framed > .columns-framed-row > div {
-  min-width: 0;
+  display: table-cell;
+  padding: 6.75px 7.5px;
+  vertical-align: top;
+  text-align: left;
+  line-height: 1.6;
 }
 
-.columns-framed > .columns-framed-row > div > :first-child {
-  margin-top: 0;
+/* colgroup widths: 2 columns default to 50% / 50% */
+.columns-framed.columns-framed-2-cols > .columns-framed-row > div {
+  width: 50%;
 }
 
-.columns-framed > .columns-framed-row > div > :last-child {
+.columns-framed.columns-framed-3-cols > .columns-framed-row > div {
+  width: 33.3333%;
+}
+
+/* 2 columns led by a cover image (playlists, books): 37.5% / 62.5% */
+.columns-framed.columns-framed-2-cols > .columns-framed-row:has(> .columns-framed-media-col:first-child) > div:first-child {
+  width: 37.5%;
+}
+
+.columns-framed.columns-framed-2-cols > .columns-framed-row:has(> .columns-framed-media-col:first-child) > div:last-child {
+  width: 62.5%;
+}
+
+/* cell paragraphs keep the global 10.5px bottom margin, except the last one */
+.columns-framed .columns-framed-col > p:last-child {
   margin-bottom: 0;
 }
 
-.columns-framed img {
+/* .imageblock: block-level image with a 15px bottom margin */
+.columns-framed .columns-framed-col > picture,
+.columns-framed .columns-framed-col > p:has(> picture:only-child) {
   display: block;
+  margin: 0 0 15px;
+}
+
+/* source images are authored with width="300" and shrink with the cell */
+.columns-framed picture img {
+  display: block;
+  width: 300px;
   max-width: 100%;
   height: auto;
 }
 
-@media (width >= 768px) {
-  .columns-framed > .columns-framed-row {
-    flex-direction: row;
-    align-items: flex-start;
-  }
-
-  .columns-framed > .columns-framed-row > div {
-    flex: 1 1 0;
-  }
-
-  /* two-column layout: media column narrower than text column (37.5% / 62.5%) */
-  .columns-framed.columns-framed-2-cols > .columns-framed-row > .columns-framed-media-col {
-    flex: 0 0 calc(37.5% - 8px);
-  }
+/* .ulist ul */
+.columns-framed .columns-framed-col > ul {
+  margin: 0 0 15px 18px;
+  padding-left: 40px;
 }

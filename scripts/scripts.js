@@ -85,6 +85,8 @@ const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
  * @param {Element} main The container element
  */
 function buildPostHeader(main) {
+  // fragments (e.g. the footer) are decorated with the page's metadata too: page main only
+  if (main !== document.querySelector('body > main')) return;
   if (getMetadata('template') !== 'blog-post' || main.querySelector('h1')) return;
   const firstSection = main.querySelector(':scope > div');
   if (!firstSection) return;

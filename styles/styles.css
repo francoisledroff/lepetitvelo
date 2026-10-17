@@ -97,14 +97,19 @@ ol {
   padding-left: 40px;
 }
 
-/* asciidoctor list paragraphs: 12px / 1.6 */
+/* asciidoctor lists: .ulist ul margin 0 0 1.25em 1.5em, li 1.6 line-height, li p 0.625em
+   (font size inherits: 15px in post bodies, 12px inside columns-framed tables) */
+main .default-content-wrapper > ul,
+main .default-content-wrapper > ol {
+  margin: 0 0 1.25em 1.5em;
+}
+
 li {
-  font-size: var(--body-font-size-s);
   line-height: 1.6;
 }
 
 li > p {
-  margin-bottom: 7.5px;
+  margin-bottom: 0.625em;
 }
 
 strong,
@@ -117,17 +122,25 @@ pre {
   font-family: var(--fixed-font-family);
 }
 
+/* asciidoctor .literalblock / .listingblock: 1.25em (of 15px) below */
 pre {
-  margin-bottom: 10.5px;
+  margin-bottom: 18.75px;
   border: 1px solid var(--code-border-color);
   border-radius: 0;
   padding: 10px;
   background-color: var(--light-color);
   color: var(--dark-color);
-  font-size: var(--body-font-size-m);
+  font-size: var(--body-font-size-s);
   line-height: var(--body-line-height);
   white-space: pre-wrap;
   overflow-wrap: break-word;
+  word-break: break-all;
+}
+
+@media (width >= 768px) {
+  pre {
+    font-size: var(--body-font-size-m);
+  }
 }
 
 pre code {
@@ -137,8 +150,9 @@ pre code {
   white-space: inherit;
 }
 
+/* asciidoctor .quoteblock: 1.25em around, inset left and right */
 blockquote {
-  margin: 0 0 18.75px;
+  margin: 1.25em;
   padding: 0 0 8.4px;
   border: 0;
   color: var(--muted-color);
@@ -150,6 +164,10 @@ blockquote p {
   font-size: 18.75px;
   font-weight: 300;
   line-height: 1.6;
+}
+
+blockquote p:last-child {
+  margin-bottom: 0;
 }
 
 hr {
@@ -245,7 +263,12 @@ main > .section > div {
   padding: 0;
 }
 
-/* blog post header (built from metadata in scripts.js), source .page-header */
+/*
+ * source .page-header: margin 42px 0 21px, padding-bottom 9.5px, 1px #ddd rule;
+ * the h1 inside keeps its 10.5px bottom margin (and the post credit its 10px).
+ */
+
+/* blog post header (built from metadata in scripts.js): h1 + credit line */
 main h1.post-title {
   margin-top: 42px;
   font-size: 1.7em;
@@ -254,20 +277,16 @@ main h1.post-title {
 main h1.post-title + p.credit {
   margin-bottom: 21px;
   border-bottom: 1px solid var(--border-color);
-  padding-bottom: 9.5px;
+  padding-bottom: calc(10px + 9.5px);
 }
 
-/* source h1 (Archives, Projects, Conferences) inside .page-header */
-main .default-content-wrapper > h1:first-child {
+/* page title (Archives, Projects, Conferences) */
+main .default-content-wrapper > h1:first-child:not(.post-title) {
   margin-top: 42px;
-  margin-bottom: 0;
+  margin-bottom: 21px;
   border-bottom: 1px solid var(--border-color);
-  padding-bottom: 9.5px;
+  padding-bottom: calc(10.5px + 9.5px);
   font-size: 1.7em;
-}
-
-main .default-content-wrapper > h1:first-child + * {
-  margin-top: 21px;
 }
 
 .credit {
@@ -276,13 +295,23 @@ main .default-content-wrapper > h1:first-child + * {
   line-height: var(--body-line-height);
 }
 
-/* listing pages: source wraps them in an extra .container.marketing (10px / 15px) */
-main > .section:has(.post-list, .tag-list) > div {
-  padding-left: var(--gutter);
+/*
+ * tag pages and tag index: source wraps them in an extra .container.marketing
+ * (10px margin, 15px padding, 1140px wide, so it overflows the column by 15px).
+ * Archives has a page title and no such wrapper.
+ */
+main > .section:has(.post-list, .tag-list):not(:has(h1)) > div {
+  margin: 0 var(--gutter);
 }
 
-main > .section:has(.post-list, .tag-list) > div:first-child {
-  margin-top: 10px;
+@media (width >= 768px) {
+  main > .section:has(.post-list, .tag-list):not(:has(h1)) > div {
+    margin-right: calc(-1 * var(--gutter));
+  }
+}
+
+main > .section:has(.post-list, .tag-list):not(:has(h1)) > div:first-child {
+  padding-top: 10px;
 }
 
 /* home: profile photo (source .imageblock, preceded by an empty JBake <p>) */

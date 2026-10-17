@@ -47,10 +47,10 @@
 
 @media (width >= 768px) {
   :root {
-    --heading-font-size-xl: 34.7px;
-    --heading-font-size-l: 25.3px;
-    --heading-font-size-m: 21.6px;
-    --heading-font-size-s: 16.9px;
+    --heading-font-size-xl: 34.6875px;
+    --heading-font-size-l: 25.3125px;
+    --heading-font-size-m: 21.5625px;
+    --heading-font-size-s: 16.875px;
     --heading-line-height: 1.4;
     --container-width: 750px;
   }
