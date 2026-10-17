@@ -1,0 +1,11 @@
+{
+  "variantName": "columns-framed",
+  "baseBlock": "columns",
+  "canonicalModel": "standalone",
+  "visualCharacteristics": "Single-row AsciiDoc layout table (frame-all grid-all), ~860px wide with a 1px light-grey rounded outer border and ~8px padding; 2-column tables split 37.5% / 62.5%. Left: cover image + Spotify link; right: bulleted tracklist in small text. Also used for 3-column tables with equal columns. Columns stack vertically below 768px.",
+  "contentPattern": "One content row; one cell per source <td> (2 or 3 cells). Cell content stays default content (picture, p, ul, a). Empty cells are dropped; rows with fewer or more cells still render. A 1x1 source table should be unwrapped to default content instead of using this block.",
+  "options": [],
+  "memberVariantIds": [],
+  "usage": "Use for side-by-side layout tables in droff.com blog posts, typically a playlist cover image with a streaming link next to a tracklist.",
+  "reuseGuidance": "Reuse for any framed 2-3 column side-by-side layout from AsciiDoc posts. Use the plain columns block for unframed layouts; use default content for single-cell tables."
+}
