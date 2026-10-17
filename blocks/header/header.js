@@ -14,16 +14,41 @@ async function loadNavFragment() {
   return container;
 }
 
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
 /**
- * Opens or closes the collapsed link list (mobile).
+ * Opens or closes the collapsed link list (mobile), sliding its height
+ * like Bootstrap's collapse (0.35s ease, see header.css).
  * @param {Element} nav nav element
  * @param {boolean} [force] desired state, toggles when omitted
  */
 function toggleMenu(nav, force) {
   const button = nav.querySelector('.nav-toggle');
+  const collapse = nav.querySelector('.nav-collapse');
   const expanded = force ?? button.getAttribute('aria-expanded') !== 'true';
+  if (expanded === nav.classList.contains('is-open')) return;
   button.setAttribute('aria-expanded', expanded);
-  nav.classList.toggle('is-open', expanded);
+
+  const animate = !isDesktop.matches && !reducedMotion.matches;
+  const done = () => {
+    collapse.classList.remove('is-collapsing');
+    collapse.style.height = '';
+    if (!expanded) nav.classList.remove('is-open');
+  };
+  if (!animate) {
+    nav.classList.toggle('is-open', expanded);
+    done();
+    return;
+  }
+
+  nav.classList.add('is-open');
+  const fullHeight = `${collapse.scrollHeight}px`;
+  collapse.style.height = expanded ? '0px' : fullHeight;
+  collapse.classList.add('is-collapsing');
+  // force a reflow so the transition starts from the height set above
+  collapse.getBoundingClientRect();
+  collapse.style.height = expanded ? fullHeight : '0px';
+  collapse.addEventListener('transitionend', done, { once: true });
 }
 
 /**

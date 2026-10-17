@@ -85,8 +85,18 @@ header .nav-collapse {
   padding: 0 var(--gutter);
 }
 
+/* padding-bottom: the source's empty .navbar-right list adds 6px under the links */
 header nav.is-open .nav-collapse {
   display: block;
+  max-height: 340px;
+  padding-bottom: 6px;
+  overflow-y: auto;
+}
+
+/* Bootstrap .collapsing: height slides between 0 and the content height */
+header .nav-collapse.is-collapsing {
+  overflow: hidden;
+  transition: height 0.35s ease;
 }
 
 header .nav-list {
@@ -133,9 +143,11 @@ header .nav-list a:focus {
   header .nav-collapse,
   header nav.is-open .nav-collapse {
     display: flex;
+    max-height: none;
     margin: 0;
     border-top: 0;
     padding: 0;
+    overflow: visible;
   }
 
   header .nav-list {
