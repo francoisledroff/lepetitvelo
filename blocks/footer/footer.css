@@ -1,20 +1,45 @@
+/*
+ * droff.com footer: an <hr> then a grey 60px #footer inside the left-aligned
+ * .container, with a small "Published under a Creative Commons…" credit.
+ */
 footer {
-  background-color: var(--light-color);
-  font-size: var(--body-font-size-xs);
+  width: var(--container-width);
+  margin-bottom: 10px;
+  padding: 0 var(--gutter);
 }
 
+/* the source's trailing <hr> between content and footer */
+footer::before {
+  content: '';
+  display: block;
+  margin: 21px 0;
+  border-top: 1px solid var(--border-color);
+}
+
+footer .footer {
+  max-width: 100%;
+  height: 60px;
+  margin: 0 -20px;
+  padding: 0 20px;
+  background-color: var(--light-color);
+}
+
+/* inner .container (10px margin) + .credit (10px margin), as padding so it stays inside the grey box */
 footer .footer > div {
-  margin: auto;
-  max-width: 1200px;
-  padding: 40px 24px 24px;
+  margin: 0;
+  padding: 20px 15px 0;
 }
 
 footer .footer p {
   margin: 0;
+  font-size: var(--body-font-size-xs);
+  line-height: var(--body-line-height);
 }
 
-@media (width >= 900px) {
-  footer .footer > div {
-    padding: 40px 32px 24px;
+/* breakpoint-exception: base.css only pulls the footer out by 20px below Bootstrap's 768px breakpoint */
+@media (width >= 768px) {
+  footer .footer {
+    margin: 0;
+    padding: 0;
   }
 }
