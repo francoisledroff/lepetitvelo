@@ -1,3 +1,5 @@
+@import url('brand.css');
+
 /*
  * Copyright 2020 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
@@ -10,64 +12,15 @@
  * governing permissions and limitations under the License.
  */
 
-:root {
-  /* colors */
-  --background-color: white;
-  --light-color: #f8f8f8;
-  --dark-color: #505050;
-  --text-color: #131313;
-  --link-color: #3b63fb;
-  --link-hover-color: #1d3ecf;
+/*
+ * Global styles reproducing droff.com (Bootstrap 3 Yeti + asciidoctor.css + base.css).
+ * Raw source default-content CSS: migration-work/default-content-extracted.css
+ */
 
-  /* fonts */
-  --body-font-family: roboto, roboto-fallback, sans-serif;
-  --heading-font-family: roboto-condensed, roboto-condensed-fallback, sans-serif;
-
-  /* body sizes */
-  --body-font-size-m: 22px;
-  --body-font-size-s: 19px;
-  --body-font-size-xs: 17px;
-
-  /* heading sizes */
-  --heading-font-size-xxl: 55px;
-  --heading-font-size-xl: 44px;
-  --heading-font-size-l: 34px;
-  --heading-font-size-m: 27px;
-  --heading-font-size-s: 24px;
-  --heading-font-size-xs: 22px;
-
-  /* nav height */
-  --nav-height: 64px;
-}
-
-/* fallback fonts */
-@font-face {
-  font-family: roboto-condensed-fallback;
-  size-adjust: 88.82%;
-  src: local('Arial');
-}
-
-@font-face {
-  font-family: roboto-fallback;
-  size-adjust: 99.529%;
-  src: local('Arial');
-}
-
-@media (width >= 900px) {
-  :root {
-    /* body sizes */
-    --body-font-size-m: 18px;
-    --body-font-size-s: 16px;
-    --body-font-size-xs: 14px;
-
-    /* heading sizes */
-    --heading-font-size-xxl: 45px;
-    --heading-font-size-xl: 36px;
-    --heading-font-size-l: 28px;
-    --heading-font-size-m: 22px;
-    --heading-font-size-s: 20px;
-    --heading-font-size-xs: 18px;
-  }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
@@ -77,15 +30,17 @@ body {
   color: var(--text-color);
   font-family: var(--body-font-family);
   font-size: var(--body-font-size-m);
-  line-height: 1.6;
+  line-height: var(--body-line-height);
 }
 
 body.appear {
   display: block;
 }
 
+/* reserve the fixed navbar's space and paint its bar before the header block loads */
 header {
   height: var(--nav-height);
+  background-color: var(--nav-background-color);
 }
 
 header .header,
@@ -98,18 +53,26 @@ footer .footer[data-block-status="loaded"] {
   visibility: visible;
 }
 
+/* headings: light weight, asciidoctor sizes; post title is 1.7em (base.css) */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  margin-top: 0.8em;
-  margin-bottom: 0.25em;
+  margin-top: 21px;
+  margin-bottom: 10.5px;
+  color: var(--text-color);
   font-family: var(--heading-font-family);
-  font-weight: 600;
-  line-height: 1.25;
-  scroll-margin: 40px;
+  font-weight: 300;
+  line-height: var(--heading-line-height);
+  scroll-margin: var(--nav-height);
+}
+
+h4,
+h5,
+h6 {
+  margin-top: 10.5px;
 }
 
 h1 { font-size: var(--heading-font-size-xxl); }
@@ -125,25 +88,74 @@ ol,
 ul,
 pre,
 blockquote {
-  margin-top: 0.8em;
-  margin-bottom: 0.25em;
+  margin-top: 0;
+  margin-bottom: 10.5px;
+}
+
+ul,
+ol {
+  padding-left: 40px;
+}
+
+/* asciidoctor list paragraphs: 12px / 1.6 */
+li {
+  font-size: var(--body-font-size-s);
+  line-height: 1.6;
+}
+
+li > p {
+  margin-bottom: 7.5px;
+}
+
+strong,
+b {
+  font-weight: 700;
 }
 
 code,
 pre {
-  font-size: var(--body-font-size-s);
+  font-family: var(--fixed-font-family);
 }
 
 pre {
-  padding: 16px;
-  border-radius: 8px;
+  margin-bottom: 10.5px;
+  border: 1px solid var(--code-border-color);
+  border-radius: 0;
+  padding: 10px;
   background-color: var(--light-color);
-  overflow-x: auto;
-  white-space: pre;
+  color: var(--dark-color);
+  font-size: var(--body-font-size-m);
+  line-height: var(--body-line-height);
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
 }
 
-main > div {
-  margin: 40px 16px;
+pre code {
+  padding: 0;
+  background: none;
+  font-size: inherit;
+  white-space: inherit;
+}
+
+blockquote {
+  margin: 0 0 18.75px;
+  padding: 0 0 8.4px;
+  border: 0;
+  color: var(--muted-color);
+  line-height: 1.6;
+}
+
+blockquote p {
+  color: var(--muted-color);
+  font-size: 18.75px;
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+hr {
+  margin: 21px 0;
+  border: 0;
+  border-top: 1px solid var(--border-color);
 }
 
 input,
@@ -160,128 +172,46 @@ a:any-link {
   overflow-wrap: break-word;
 }
 
-a:hover {
+a:hover,
+a:focus {
   color: var(--link-hover-color);
   text-decoration: underline;
 }
 
-/* buttons */
-p.button-wrapper {
-  margin: 12px 0;
+a:focus-visible {
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
 }
 
-a.button:any-link,
-button.button {
-  box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  max-width: 100%;
+/* buttons: the source has none, render EDS buttons as plain links */
+main .button-container {
+  display: inline;
+}
+
+main a.button:any-link {
   margin: 0;
-  border: 2px solid transparent;
-  border-radius: 2.4em;
-  padding: 0.5em 1.2em;
-  font: inherit;
-  font-weight: 500;
-  line-height: 1.25;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  background: none;
+  color: var(--link-color);
+  font-size: inherit;
+  font-weight: inherit;
   text-decoration: none;
-  cursor: pointer;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
 }
 
-a.button[aria-disabled="true"],
-button.button:disabled {
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-a.button.primary,
-button.button.primary {
-  border-color: var(--text-color);
-  background-color: var(--text-color);
-  color: var(--background-color);
-}
-
-a.button.primary:hover,
-a.button.primary:focus-visible,
-button.button.primary:hover,
-button.button.primary:focus-visible {
-  border-color: var(--dark-color);
-  background-color: var(--dark-color);
-  color: var(--light-color);
-}
-
-a.button.primary[aria-disabled="true"],
-a.button.primary[aria-disabled="true"]:hover,
-a.button.primary[aria-disabled="true"]:focus-visible,
-button.button.primary:disabled,
-button.button.primary:disabled:hover,
-button.button.primary:disabled:focus-visible {
-  background-color: var(--light-color);
-  border-color: var(--light-color);
-  color: var(--dark-color);
-}
-
-a.button.secondary,
-button.button.secondary {
-  border-color: var(--text-color);
-  background-color: transparent;
-  color: var(--text-color);
-}
-
-a.button.secondary:hover,
-a.button.secondary:focus-visible,
-button.button.secondary:hover,
-button.button.secondary:focus-visible {
-  border-color: var(--dark-color);
-  background-color: var(--light-color);
-  color: var(--dark-color);
-}
-
-a.button.secondary[aria-disabled="true"],
-a.button.secondary[aria-disabled="true"]:hover,
-a.button.secondary[aria-disabled="true"]:focus-visible,
-button.button.secondary:disabled,
-button.button.secondary:disabled:hover,
-button.button.secondary:disabled:focus-visible {
-  background-color: var(--light-color);
-  border-color: var(--light-color);
-  color: var(--dark-color);
-}
-
-/* high-impact call-to-action */
-a.button.accent,
-button.button.accent {
-  border-color: var(--link-color);
-  background-color: var(--link-color);
-  color: var(--background-color);
-}
-
-a.button.accent:hover,
-a.button.accent:focus-visible,
-button.button.accent:hover,
-button.button.accent:focus-visible {
-  border-color: var(--link-hover-color);
-  background-color: var(--link-hover-color);
-}
-
-a.button.accent[aria-disabled="true"],
-a.button.accent[aria-disabled="true"]:hover,
-a.button.accent[aria-disabled="true"]:focus-visible,
-button.button.accent:disabled,
-button.button.accent:disabled:hover,
-button.button.accent:disabled:focus-visible {
-  background-color: var(--light-color);
-  border-color: var(--light-color);
-  color: var(--dark-color);
+main a.button:hover,
+main a.button:focus {
+  color: var(--link-hover-color);
+  text-decoration: underline;
 }
 
 main img {
   max-width: 100%;
   width: auto;
   height: auto;
+  vertical-align: middle;
 }
 
 .icon {
@@ -295,31 +225,78 @@ main img {
   width: 100%;
 }
 
-/* sections */
+/*
+ * layout: Bootstrap .container (750/970/1170px) — left aligned, not centered,
+ * because droff.com's base.css sets `.container { margin: 10px 0 }`.
+ */
+main {
+  padding-top: calc(var(--content-top) - var(--nav-height));
+}
+
 main > .section {
-  margin: 40px 0;
+  width: var(--container-width);
+  margin: 0;
+  padding: 0 var(--gutter);
 }
 
 main > .section > div {
-  max-width: 1200px;
-  margin: auto;
-  padding: 0 24px;
+  max-width: none;
+  margin: 0;
+  padding: 0;
 }
 
-main > .section:first-of-type {
-  margin-top: 0;
+/* blog post header (built from metadata in scripts.js), source .page-header */
+main h1.post-title {
+  margin-top: 42px;
+  font-size: 1.7em;
 }
 
-@media (width >= 900px) {
-  main > .section > div {
-    padding: 0 32px;
-  }
+main h1.post-title + p.credit {
+  margin-bottom: 21px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 9.5px;
+}
+
+/* source h1 (Archives, Projects, Conferences) inside .page-header */
+main .default-content-wrapper > h1:first-child {
+  margin-top: 42px;
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 9.5px;
+  font-size: 1.7em;
+}
+
+main .default-content-wrapper > h1:first-child + * {
+  margin-top: 21px;
+}
+
+.credit {
+  margin: 10px 0;
+  font-size: 0.6em;
+  line-height: var(--body-line-height);
+}
+
+/* listing pages: source wraps them in an extra .container.marketing (10px / 15px) */
+main > .section:has(.post-list, .tag-list) > div {
+  padding-left: var(--gutter);
+}
+
+main > .section:has(.post-list, .tag-list) > div:first-child {
+  margin-top: 10px;
+}
+
+/* home: profile photo (source .imageblock, preceded by an empty JBake <p>) */
+main .default-content-wrapper > p:has(> picture:only-child) {
+  margin-bottom: 18.75px;
+}
+
+main .default-content-wrapper > p:first-child:has(> picture:only-child) {
+  margin-top: 10.5px;
 }
 
 /* section metadata */
 main .section.light,
 main .section.highlight {
   background-color: var(--light-color);
-  margin: 0;
-  padding: 40px 0;
+  padding: 40px var(--gutter);
 }
