@@ -12,6 +12,26 @@
     window.isErrorPage = true;
     window.errorCode = '404';
   </script>
+  <script nonce="aem" type="text/javascript">
+    // Legacy droff.com URLs the redirects sheet can't match (accents, spaces, other
+    // variants): normalize like the migration importer and forward if that changes the path.
+    (() => {
+      const { pathname, search, hash } = window.location;
+      const clean = (s) => {
+        let d = s;
+        try { d = decodeURIComponent(s); } catch (e) { /* keep raw */ }
+        return d.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      };
+      const segments = pathname.replace(/\/index\.html?$/i, '/').split('/').filter(Boolean);
+      const last = segments.pop() || '';
+      const m = last.match(/^(.*)\.([a-z0-9]+)$/i);
+      let tail = clean(last);
+      if (m) tail = /^html?$/i.test(m[2]) ? clean(m[1]) : `${clean(m[1])}.${m[2].toLowerCase()}`;
+      const target = `/${[...segments.map(clean), tail].filter(Boolean).join('/')}`;
+      if (target !== pathname) window.location.replace(`${target}${search}${hash}`);
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta property="og:title" content="Page not found">
   <script nonce="aem" src="/scripts/scripts.js" type="module"></script>
