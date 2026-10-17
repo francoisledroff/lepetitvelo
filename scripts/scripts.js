@@ -89,11 +89,11 @@ function buildPostHeader(main) {
   const firstSection = main.querySelector(':scope > div');
   if (!firstSection) return;
 
-  const header = document.createElement('div');
-  header.className = 'page-header';
+  // Plain default content (a wrapper div would be decorated as a block)
   const h1 = document.createElement('h1');
+  h1.className = 'post-title';
   h1.textContent = getMetadata('og:title') || document.title;
-  header.append(h1);
+  const header = [h1];
 
   const date = parseDate(getMetadata('date'));
   const tags = parseTags(getMetadata('article:tag') || getMetadata('tags'));
@@ -113,9 +113,9 @@ function buildPostHeader(main) {
         credit.append(a, ' ');
       });
     }
-    header.append(credit);
+    header.push(credit);
   }
-  firstSection.prepend(header);
+  firstSection.prepend(...header);
 }
 
 /**
