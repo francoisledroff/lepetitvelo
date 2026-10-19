@@ -2,12 +2,13 @@
 const isDesktop = window.matchMedia('(min-width: 768px)');
 
 /**
- * Loads the nav fragment: /content first (local preview), then the site root (DA/EDS).
+ * Loads the nav fragment: site root first (DA/EDS), then /content (local import preview),
+ * so published pages never log a 404 for the fallback path.
  * @returns {Promise<Element|null>} container holding the fragment sections
  */
 async function loadNavFragment() {
-  let resp = await fetch('/content/nav.plain.html');
-  if (!resp.ok) resp = await fetch('/nav.plain.html');
+  let resp = await fetch('/nav.plain.html');
+  if (!resp.ok) resp = await fetch('/content/nav.plain.html');
   if (!resp.ok) return null;
   const container = document.createElement('div');
   container.innerHTML = await resp.text();

@@ -83,7 +83,19 @@ export default function transform(hookName, element, payload) {
   if (header && isPost) header.remove();
   else if (header) header.replaceWith(...header.childNodes);
 
-  const description = firstParagraphText(element);
+  // Listing pages have no body paragraph: describe them from their heading
+  const headingText = (sel) => {
+    const h = [...element.querySelectorAll(sel)].find((el) => !el.closest('table'));
+    return h ? clean(h.textContent) : '';
+  };
+  const tagged = headingText('h1, h2, h3, h4').match(/Articles Tagged `([^`]+)`/i);
+  const pageTitle = headingText('h1');
+  const listingDescription = (tagged && `Articles tagged ${tagged[1]} on Chez François, François Le Droff's blog.`)
+    || (/^Archives$/i.test(pageTitle) && "All posts on Chez François, François Le Droff's blog, since 2004.")
+    || (/^Tags\s*:?$/i.test(headingText('h4')) && "All tags used on Chez François, François Le Droff's blog.")
+    || '';
+
+  const description = firstParagraphText(element) || listingDescription;
   if (description) meta.Description = truncate(description);
 
   if (Object.keys(meta).length) {
