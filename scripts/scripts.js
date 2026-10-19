@@ -10,7 +10,9 @@ import {
   loadSections,
   loadCSS,
   buildBlock,
+  getMetadata,
 } from './aem.js';
+import { tagSlug, parseTags, parseDate } from './post-index.js';
 
 if (window.trustedTypes && window.trustedTypes.createPolicy) {
   const innerTT = window.trustedTypes.createPolicy('tt-inner', {
@@ -73,11 +75,62 @@ function buildWidgetAutoBlocks(main) {
   });
 }
 
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+  'August', 'September', 'October', 'November', 'December'];
+
+/**
+ * Blog posts carry title, date and tags as metadata (they feed the post-list
+ * and tag-list blocks). Rebuilds the source page header from them:
+ * <h1>title</h1><p class="credit">First published on June 21 2018 and tagged …</p>
+ * @param {Element} main The container element
+ */
+function buildPostHeader(main) {
+  // fragments (e.g. the footer) are decorated with the page's metadata too: page main only
+  if (main !== document.querySelector('body > main')) return;
+  if (getMetadata('template') !== 'blog-post' || main.querySelector('h1')) return;
+  const firstSection = main.querySelector(':scope > div');
+  if (!firstSection) return;
+
+  // Plain default content (a wrapper div would be decorated as a block)
+  const h1 = document.createElement('h1');
+  h1.className = 'post-title';
+  h1.textContent = getMetadata('og:title') || document.title;
+  const header = [h1];
+
+  const date = parseDate(getMetadata('date'));
+  const tags = parseTags(getMetadata('article:tag') || getMetadata('tags'));
+  if (date || tags.length) {
+    const credit = document.createElement('p');
+    credit.className = 'credit';
+    if (date) {
+      const day = String(date.getUTCDate()).padStart(2, '0');
+      credit.append(`First published on ${MONTHS[date.getUTCMonth()]} ${day} ${date.getUTCFullYear()}`);
+    }
+    if (tags.length) {
+      credit.append(date ? ' and tagged ' : 'Tagged ');
+      tags.forEach((tag) => {
+        const a = document.createElement('a');
+        a.href = `/tags/${tagSlug(tag)}`;
+        a.textContent = `${tag} . `;
+        credit.append(a, ' ');
+      });
+    }
+    header.push(credit);
+  }
+  firstSection.prepend(...header);
+}
+
 /**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
  */
 function buildAutoBlocks(main) {
+  try {
+    buildPostHeader(main);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Post header failed', error);
+  }
   try {
     // auto load `*/fragments/*` references
     const fragments = [...main.querySelectorAll('a[href*="/fragments/"]')].filter((f) => !f.closest('.fragment'));

@@ -1,0 +1,69 @@
+/*
+ * droff.com brand tokens (Bootstrap 3 "Yeti" theme + asciidoctor.css + base.css),
+ * extracted from computed styles of https://droff.com/ (see migration-work/brand.json).
+ */
+
+:root {
+  /* colors */
+  --background-color: #fff;
+  --light-color: #f5f5f5;
+  --dark-color: #333;
+  --text-color: #222;
+  --muted-color: #6f6f6f;
+  --border-color: #ddd;
+  --code-border-color: #ccc;
+  --link-color: #008cba;
+  --link-hover-color: #00526e;
+  --nav-background-color: #333;
+  --nav-hover-background-color: #272727;
+  --nav-text-color: #fff;
+
+  /* fonts: Open Sans (Google Fonts, see fonts.css) with the source's fallback stack */
+  --body-font-family: "Open Sans", "Helvetica Neue", helvetica, arial, sans-serif;
+  --heading-font-family: var(--body-font-family);
+  --fixed-font-family: menlo, monaco, consolas, "Courier New", monospace;
+
+  /* body sizes */
+  --body-font-size-m: 15px;
+  --body-font-size-s: 12px;
+  --body-font-size-xs: 9px;
+  --body-line-height: 1.4286;
+
+  /* heading sizes (mobile, < 768px) */
+  --heading-font-size-xxl: 25.5px;
+  --heading-font-size-xl: 25.3px;
+  --heading-font-size-l: 20.6px;
+  --heading-font-size-m: 19px;
+  --heading-font-size-s: 16.9px;
+  --heading-font-size-xs: 15px;
+  --heading-line-height: 1.1;
+
+  /* layout */
+  --nav-height: 65px;
+  --content-top: 70px;
+  --gutter: 15px;
+  --container-width: 100%;
+}
+
+@media (width >= 768px) {
+  :root {
+    --heading-font-size-xl: 34.6875px;
+    --heading-font-size-l: 25.3125px;
+    --heading-font-size-m: 21.5625px;
+    --heading-font-size-s: 16.875px;
+    --heading-line-height: 1.4;
+    --container-width: 750px;
+  }
+}
+
+@media (width >= 992px) {
+  :root {
+    --container-width: 970px;
+  }
+}
+
+@media (width >= 1200px) {
+  :root {
+    --container-width: 1170px;
+  }
+}

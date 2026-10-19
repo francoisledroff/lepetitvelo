@@ -1,0 +1,11 @@
+{
+  "variantName": "post-list",
+  "baseBlock": "post-list",
+  "canonicalModel": "standalone",
+  "visualCharacteristics": "Plain JBake/Bootstrap 3 archive listing: an 18px h4 per year (margin 10px 0) followed by a bulleted list (padding-left 40px, line-height 1.42857) of 'DD Mon - Title' items; titles are blue links without underline, underlined on hover. No layout changes across breakpoints.",
+  "contentPattern": "Dynamic block. Optional single key/value row 'Tag | <name>'. Posts come from /query-index.json (template blog-post), filtered by tag slug when a tag is given, sorted by date descending and grouped by year. Renders nothing when no post matches.",
+  "options": [],
+  "memberVariantIds": [],
+  "usage": "Use on droff.com archive (/archive) and tag pages (/tags/<slug>) to list blog posts by year; auto-updates from the query index.",
+  "reuseGuidance": "Reuse for any date-grouped post listing. Add a Tag row for tag pages; leave it out for the full archive. Use tag-list for the list of all tags."
+}

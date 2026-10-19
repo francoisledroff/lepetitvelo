@@ -1,0 +1,17 @@
+/* source: h4 + p — a single paragraph of inline "Tag . " links */
+.tag-list p {
+  margin: 0 0 10.5px;
+  font-size: var(--body-font-size-m);
+  line-height: var(--body-line-height);
+}
+
+.tag-list a:any-link {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+.tag-list a:hover,
+.tag-list a:focus {
+  color: var(--link-hover-color);
+  text-decoration: underline;
+}

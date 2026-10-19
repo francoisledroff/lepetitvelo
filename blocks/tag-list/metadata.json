@@ -1,0 +1,11 @@
+{
+  "variantName": "tag-list",
+  "baseBlock": "tag-list",
+  "canonicalModel": "standalone",
+  "visualCharacteristics": "Single paragraph of inline blue links in the JBake 'Tag . ' style (no underline, underlined on hover), wrapping naturally. No layout changes across breakpoints.",
+  "contentPattern": "Dynamic block with no authored rows. Collects every tag from blog posts in /query-index.json, dedupes by tag slug (most frequent casing wins), sorts alphabetically (French, accent/case-insensitive) and links each to /tags/<slug>.",
+  "options": [],
+  "memberVariantIds": [],
+  "usage": "Use on the droff.com 'all tags' page (/listalltags) to link to every tag page; auto-updates from the query index.",
+  "reuseGuidance": "Reuse wherever a full tag cloud/index is needed. Use post-list with a Tag row for the per-tag post listing."
+}

@@ -1,160 +1,125 @@
-import { getMetadata } from '../../scripts/aem.js';
-import { loadFragment } from '../fragment/fragment.js';
-
-// media query match that indicates mobile/tablet width
-const isDesktop = window.matchMedia('(min-width: 900px)');
+// Below this width the links collapse behind the toggle button (Bootstrap 3 grid-float-breakpoint)
+const isDesktop = window.matchMedia('(min-width: 768px)');
 
 /**
- * Closes the open nav dropdown (desktop) or the nav menu (mobile) on Escape
- * @param {KeyboardEvent} e keydown event
+ * Loads the nav fragment: site root first (DA/EDS), then /content (local import preview),
+ * so published pages never log a 404 for the fallback path.
+ * @returns {Promise<Element|null>} container holding the fragment sections
  */
-function closeOnEscape(e) {
-  if (e.code === 'Escape') {
-    const nav = document.getElementById('nav');
-    const navSections = nav.querySelector('.nav-sections');
-    if (!navSections) return;
-    const navSectionExpanded = navSections.querySelector('[aria-expanded="true"]');
-    if (navSectionExpanded && isDesktop.matches) {
-      // eslint-disable-next-line no-use-before-define
-      toggleAllNavSections(navSections);
-      navSectionExpanded.focus();
-    } else if (!isDesktop.matches) {
-      // eslint-disable-next-line no-use-before-define
-      toggleMenu(nav, navSections);
-      nav.querySelector('button').focus();
-    }
+async function loadNavFragment() {
+  let resp = await fetch('/nav.plain.html');
+  if (!resp.ok) resp = await fetch('/content/nav.plain.html');
+  if (!resp.ok) return null;
+  const container = document.createElement('div');
+  container.innerHTML = await resp.text();
+  return container;
+}
+
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+/**
+ * Opens or closes the collapsed link list (mobile), sliding its height
+ * like Bootstrap's collapse (0.35s ease, see header.css).
+ * @param {Element} nav nav element
+ * @param {boolean} [force] desired state, toggles when omitted
+ */
+function toggleMenu(nav, force) {
+  const button = nav.querySelector('.nav-toggle');
+  const collapse = nav.querySelector('.nav-collapse');
+  const expanded = force ?? button.getAttribute('aria-expanded') !== 'true';
+  if (expanded === nav.classList.contains('is-open')) return;
+  button.setAttribute('aria-expanded', expanded);
+
+  const animate = !isDesktop.matches && !reducedMotion.matches;
+  const done = () => {
+    collapse.classList.remove('is-collapsing');
+    collapse.style.height = '';
+    if (!expanded) nav.classList.remove('is-open');
+  };
+  if (!animate) {
+    nav.classList.toggle('is-open', expanded);
+    done();
+    return;
   }
+
+  nav.classList.add('is-open');
+  const fullHeight = `${collapse.scrollHeight}px`;
+  collapse.style.height = expanded ? '0px' : fullHeight;
+  collapse.classList.add('is-collapsing');
+  // force a reflow so the transition starts from the height set above
+  collapse.getBoundingClientRect();
+  collapse.style.height = expanded ? fullHeight : '0px';
+  collapse.addEventListener('transitionend', done, { once: true });
 }
 
 /**
- * Closes the open nav dropdown (desktop) or the nav menu (mobile) when focus leaves the nav
- * @param {FocusEvent} e focusout event
- */
-function closeOnFocusLost(e) {
-  const nav = e.currentTarget;
-  if (!nav.contains(e.relatedTarget)) {
-    const navSections = nav.querySelector('.nav-sections');
-    if (!navSections) return;
-    const navSectionExpanded = navSections.querySelector('[aria-expanded="true"]');
-    if (navSectionExpanded && isDesktop.matches) {
-      // eslint-disable-next-line no-use-before-define
-      toggleAllNavSections(navSections, false);
-    } else if (!isDesktop.matches) {
-      // eslint-disable-next-line no-use-before-define
-      toggleMenu(nav, navSections, false);
-    }
-  }
-}
-
-/**
- * Toggles all nav sections
- * @param {Element} sections The container element
- * @param {Boolean|string} expanded Whether the element should be expanded or collapsed
- */
-function toggleAllNavSections(sections, expanded = false) {
-  if (!sections) return;
-  sections.querySelectorAll('.nav-drop > button').forEach((button) => {
-    button.setAttribute('aria-expanded', expanded);
-  });
-}
-
-/**
- * Toggles the entire nav
- * @param {Element} nav The container element
- * @param {Element} navSections The nav sections within the container element
- * @param {*} forceExpanded Optional param to force nav expand behavior when not null
- */
-function toggleMenu(nav, navSections, forceExpanded = null) {
-  const expanded = forceExpanded !== null ? !forceExpanded : nav.getAttribute('aria-expanded') === 'true';
-  const button = nav.querySelector('.nav-hamburger button');
-  document.body.style.overflowY = (expanded || isDesktop.matches) ? '' : 'hidden';
-  // the desktop nav is always expanded, so aria-expanded only applies to the mobile menu
-  if (isDesktop.matches) nav.removeAttribute('aria-expanded');
-  else nav.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-  toggleAllNavSections(navSections, expanded || isDesktop.matches ? 'false' : 'true');
-  button.setAttribute('aria-label', expanded ? 'Open navigation' : 'Close navigation');
-
-  // enable menu collapse on escape keypress
-  if (!expanded || isDesktop.matches) {
-    // collapse menu on escape press
-    window.addEventListener('keydown', closeOnEscape);
-    // collapse menu on focus lost
-    nav.addEventListener('focusout', closeOnFocusLost);
-  } else {
-    window.removeEventListener('keydown', closeOnEscape);
-    nav.removeEventListener('focusout', closeOnFocusLost);
-  }
-}
-
-/**
- * loads and decorates the header, mainly the nav
+ * Builds a Bootstrap-like navbar from the fragment: first section = brand,
+ * every list in the following sections = top-level links.
  * @param {Element} block The header block element
  */
 export default async function decorate(block) {
-  // load nav as fragment
-  const navMeta = getMetadata('nav');
-  const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
-  const fragment = await loadFragment(navPath);
-
-  // decorate nav DOM
+  const fragment = await loadNavFragment();
   block.textContent = '';
+  if (!fragment) return;
+
+  const sections = [...fragment.querySelectorAll(':scope > div')];
+  const [brandSection, ...linkSections] = sections;
+
   const nav = document.createElement('nav');
   nav.id = 'nav';
-  while (fragment.firstElementChild) nav.append(fragment.firstElementChild);
+  nav.setAttribute('aria-label', 'Main navigation');
 
-  const classes = ['brand', 'sections', 'tools'];
-  classes.forEach((c, i) => {
-    const section = nav.children[i];
-    if (section) section.classList.add(`nav-${c}`);
+  const container = document.createElement('div');
+  container.className = 'nav-container';
+
+  // brand + toggle
+  const navHeader = document.createElement('div');
+  navHeader.className = 'nav-header';
+  const brandLink = brandSection && brandSection.querySelector('a');
+  if (brandLink) {
+    brandLink.className = 'nav-brand';
+    navHeader.append(brandLink);
+  }
+
+  const collapse = document.createElement('div');
+  collapse.className = 'nav-collapse';
+  collapse.id = 'nav-collapse';
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'nav-toggle';
+  button.setAttribute('aria-controls', collapse.id);
+  button.setAttribute('aria-expanded', 'false');
+  button.setAttribute('aria-label', 'Toggle navigation');
+  button.innerHTML = '<span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>';
+  navHeader.append(button);
+
+  // links
+  linkSections.forEach((section) => {
+    section.querySelectorAll(':scope > ul').forEach((ul) => {
+      ul.className = 'nav-list';
+      ul.querySelectorAll('a[href^="http"]').forEach((a) => {
+        if (new URL(a.href).host !== window.location.host) a.rel = 'noopener';
+      });
+      collapse.append(ul);
+    });
   });
 
-  const navBrand = nav.querySelector('.nav-brand');
-  const brandLink = navBrand.querySelector('.button');
-  if (brandLink) {
-    brandLink.className = '';
-    brandLink.closest('.button-container').className = '';
-  }
+  container.append(navHeader, collapse);
+  nav.append(container);
 
-  const navSections = nav.querySelector('.nav-sections');
-  if (navSections) {
-    navSections.querySelectorAll(':scope .default-content-wrapper > ul > li').forEach((navSection) => {
-      const subList = navSection.querySelector(':scope > ul');
-      if (!subList) return;
-      navSection.classList.add('nav-drop');
-      // wrap the dropdown label in a button so it is announced as expandable
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.setAttribute('aria-expanded', false);
-      [...navSection.childNodes].forEach((node) => {
-        if (node !== subList) button.append(node);
-      });
-      navSection.prepend(button);
-      button.addEventListener('click', () => {
-        const expanded = button.getAttribute('aria-expanded') === 'true';
-        if (isDesktop.matches) {
-          button.focus();
-          toggleAllNavSections(navSections);
-        }
-        button.setAttribute('aria-expanded', !expanded);
-      });
-    });
-  }
+  button.addEventListener('click', () => toggleMenu(nav));
+  nav.addEventListener('keydown', (e) => {
+    if (e.code === 'Escape' && !isDesktop.matches && nav.classList.contains('is-open')) {
+      toggleMenu(nav, false);
+      button.focus();
+    }
+  });
+  // crossing the breakpoint resets the mobile menu state
+  isDesktop.addEventListener('change', () => toggleMenu(nav, false));
 
-  // hamburger for mobile
-  const hamburger = document.createElement('div');
-  hamburger.classList.add('nav-hamburger');
-  hamburger.innerHTML = `<button type="button" aria-controls="nav" aria-label="Open navigation">
-      <span class="nav-hamburger-icon"></span>
-    </button>`;
-  hamburger.addEventListener('click', () => toggleMenu(nav, navSections));
-  nav.prepend(hamburger);
-  nav.setAttribute('aria-expanded', 'false');
-  // prevent mobile nav behavior on window resize
-  toggleMenu(nav, navSections, isDesktop.matches);
-  isDesktop.addEventListener('change', () => toggleMenu(nav, navSections, isDesktop.matches));
-
-  const navWrapper = document.createElement('div');
-  navWrapper.className = 'nav-wrapper';
-  navWrapper.append(nav);
-  block.append(navWrapper);
+  const wrapper = document.createElement('div');
+  wrapper.className = 'nav-wrapper';
+  wrapper.append(nav);
+  block.append(wrapper);
 }
